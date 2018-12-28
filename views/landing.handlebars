@@ -422,17 +422,17 @@
                             })
                             maktMaktx = maktMaktx.join("<br /><br />");
                             $('#meterial_table').dataTable().fnAddData([
-                                final_data[j].mara_matnr,
-                                final_data[j].mara_mtart,
+                                final_data[j].mara_matnr || '',
+                                final_data[j].mara_mtart || '',
                                 maktMaktx,
-                                final_data[j].mara_matkl,
-                                final_data[j].mara_vhart,
-                                final_data[j].mara_ersda,
-                                final_data[j].mara_ernam,
-                                final_data[j].mara_pstat,
-                                final_data[j].mara_mbrsh,
-                                final_data[j].mara_meins,
-                                final_data[j].mara_prdha,
+                                final_data[j].mara_matkl || '',
+                                final_data[j].mara_vhart || '',
+                                final_data[j].mara_ersda || '',
+                                final_data[j].mara_ernam || '',
+                                final_data[j].mara_pstat || '',
+                                final_data[j].mara_mbrsh || '',
+                                final_data[j].mara_meins || '',
+                                final_data[j].mara_prdha || '',
 
                             ]);
                         }
@@ -455,15 +455,15 @@
                             })
                             knvk_props = knvk_props.join("<br /><br />");
                             $('#customer_table').dataTable().fnAddData([
-                                final_data[j].kna1_kunnr,
-                                final_data[j].kna1_land1,
-                                final_data[j].kna1_name1,
-                                final_data[j].kna1_name2,
-                                final_data[j].kna1_ort01,
-                                final_data[j].kna1_pstlz,
-                                final_data[j].kna1_stras,
-                                knb1_props,
-                                knvk_props
+                                final_data[j].kna1_kunnr || '',
+                                final_data[j].kna1_land1 || '',
+                                final_data[j].kna1_name1 || '',
+                                final_data[j].kna1_name2 || '',
+                                final_data[j].kna1_ort01 || '',
+                                final_data[j].kna1_pstlz || '',
+                                final_data[j].kna1_stras || '',
+                                knb1_props || '',
+                                knvk_props || ''
 
 
                             ]);
@@ -624,8 +624,8 @@
                          success: function (data) {
                                  let showText=[]
                                  let mara_ernam=data.mara_ernam.split(' ')
- 
- 
+
+
                          }
                      })
                      //

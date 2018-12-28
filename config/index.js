@@ -1,12 +1,12 @@
 var env = process.env.NODE_ENV || 'development'
 var config = {
     development: {
-        baseUrl:'http://35.154.219.199',
+        baseUrl:'http://35.200.147.172',
         ingest:false,
         port: 5003,
         baseURI: '',
         elasticSearch: {
-            host: 'localhost:9200',
+            host: '35.200.193.85:9200',
             profileType: 'data',
             profileIndex: {
                 makt:'makt',
