@@ -5,7 +5,7 @@ const config = require('./config/index')
 
 function insert(query, callback) {
     let baseData = {
-        index: config.elasticSearch.profileIndex.customer,
+        index: config.elasticSearch.profileIndex.test,
         type: config.elasticSearch.profileType,
         body: query
     }
@@ -72,8 +72,9 @@ function processFile(inputFile) {
 
 function start() {
 
-     processFile(__dirname + '/' + 'customer_master.jl');
-    //     processFile(__dirname + '/' + 'mara_makt.jl');
+  //processFile(__dirname + '/' + 'customer_master.jl');
+  //processFile(__dirname + '/' + 'mara_makt.jl');
+  processFile(__dirname + '/' + 'material.jl');
 }
 
 module.exports = {

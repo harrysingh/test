@@ -9,6 +9,7 @@
 
             <div>
                 <select class="form-control" id="selected_index">
+                    <option value="test">Test</option>
                     <option value="makt">Material</option>
                     <option value="customer">Customer</option>
                 </select>
@@ -118,6 +119,20 @@
             </div>
 
             <div id='textSearch' class="row">
+                <label class="switch">
+                    <select name="Select minimum result relevant %" id="minScore">
+                        <option value="0.1">10% Relevant</option>
+                        <option value="0.2">20% Relevant</option>
+                        <option value="0.3">30% Relevant</option>
+                        <option value="0.4">40% Relevant</option>
+                        <option value="0.5">50% Relevant</option>
+                        <option value="0.6">60% Relevant</option>
+                        <option value="0.7">70% Relevant</option>
+                        <option value="0.8" selected="selected">80% Relevant</option>
+                        <option value="0.9">90% Relevant</option>
+                        <option value="1.0">100% Relevant</option>
+                    </select>
+                </label>
                 <div class="col-md-2">  <label class="exactMatchText">Exact match</label></div>
                 <div class="col-md-1">
 
@@ -152,6 +167,23 @@
         </div>
     </div>
     <div class="row" id="tableData">
+        <div class="table-responsive">
+            <table id="meterial_test_table" class="display hidden test_results table table-hover" style="width: 95%">
+                <thead>
+                <tr>
+                    <th style="color:#3c763d" class="resultCount"></th>
+                </tr>
+                <tr>
+                    <th>Material Number</th>
+                    <th>Inspection Long Text</th>
+                    <th>Basic Long Text</th>
+                    <th>PO Long Text</th>
+                </tr>
+                <tbody>
+                </tbody>
+                </thead>
+            </table>
+        </div>
         <div class="table-responsive">
             <table id="customer_table" class="display hidden customer_results table table-hover" style="width: 95%">
                 <thead>
@@ -225,13 +257,14 @@
 </script>
 <script>
     function showNextPage(that) {
-        let text = getUrlParameter('search-text')
+        let text = getUrlParameter('search-text');
+        let minScore =  getUrlParameter('min-score');
         let pageNo = $(that).attr('value')
         let index = getUrlParameter('index') || 'makt'
         let exactMatch=getUrlParameter('exactMatch') || false
         let redirectText = '/?search-text=' + text
         if (pageNo > 0) {
-            redirectText = redirectText + '&page=' + pageNo + '&index=' + index + '&exactMatch='+exactMatch
+            redirectText = redirectText + '&page=' + pageNo + '&index=' + index + '&exactMatch='+exactMatch + '&minScore=' + minScore;
         }
         if (!pageNo || pageNo < 0) {
             pageNo = 0
@@ -239,7 +272,6 @@
 
         location.href = redirectText
     }
-    let maximumPagination = 0
 
 
     function getUrlParameter(sParam) {
@@ -258,18 +290,26 @@
 
         let text = getUrlParameter('search-text')
         let index = getUrlParameter('index') || "makt"
-        let exactMatch=getUrlParameter('exactMatch') || false
+        let exactMatch=getUrlParameter('exactMatch') || false;
+        let minScore = getUrlParameter('minScore') || '0.8';
 
     if(exactMatch==='true') {
         $("#exactMatch").prop("checked", true)
     }
+
+    $("#minScore").change(function() {
+        $("#search").trigger('click')
+    });
     $("#exactMatch").change(function() {
 
             $("#search").trigger('click')
 
     });
-         $("#search-text").val(text)
+
+        $("#search-text").val(text)
         $("#selected_index").val(index)
+        $("#minScore").val(minScore);
+
         if (text && index) {
             let pageNo = getUrlParameter('page')
             if (!pageNo || !pageNo / 1) {
@@ -279,11 +319,12 @@
                 pageNo = pageNo - 1
             }
 
-            loadMore(index, text.trim(), pageNo)
+            loadMore(index, text.trim(), minScore, pageNo)
         }
 
         function nextSlotPagination() {
             let text = getUrlParameter('search-text')
+            let minScore =  getUrlParameter('min-score');
             let pageNo = getUrlParameter('page')
             let index = getUrlParameter('index') || 'makt'
             let exactMatch=getUrlParameter('exactMatch') || false
@@ -292,12 +333,13 @@
             }
             pageNo = parseInt(pageNo) + 1
             if (text) {
-                location.href = '/?search-text=' + text + '&page=' + pageNo + '&index=' + index+'&exactMatch='+exactMatch
+                location.href = '/?search-text=' + text + '&page=' + pageNo + '&index=' + index+'&exactMatch='+exactMatch+ '&minScore=' + minScore;
             }
         }
 
         function previousSlotPagination() {
             let text = getUrlParameter('search-text')
+            let minScore =  getUrlParameter('min-score');
             let pageNo = getUrlParameter('page')
             let index = getUrlParameter('index') || 'makt'
             let exactMatch=getUrlParameter('exactMatch') || false
@@ -309,18 +351,19 @@
                 pageNo = 0
             }
             if (text) {
-                location.href = '/?search-text=' + text + '&page=' + pageNo + '&index=' + index+'&exactMatch='+exactMatch
+                location.href = '/?search-text=' + text + '&page=' + pageNo + '&index=' + index+'&exactMatch='+exactMatch+ '&minScore=' + minScore;
             }
         }
 
         function showNextPage(that) {
             let text = getUrlParameter('search-text')
+            let minScore =  getUrlParameter('min-score');
             let pageNo = $(that).attr('value')
             let index = getUrlParameter('index') || 'makt'
             let redirectText = '/?search-text=' + text
             let exactMatch=getUrlParameter('exactMatch') || false
             if (pageNo > 0) {
-                redirectText = redirectText + '&page=' + pageNo + '&index=' + index+'&exactMatch='+exactMatch
+                redirectText = redirectText + '&page=' + pageNo + '&index=' + index+'&exactMatch='+exactMatch+ '&minScore=' + minScore;
             }
             if (!pageNo || pageNo < 0) {
                 pageNo = 0
@@ -329,11 +372,11 @@
             location.href = redirectText
         }
 
-        let showNext = false
-        let showPrevious = false
+        let showNext = false;
+        let showPrevious = false;
 
 
-        function loadMore(index, searchText, pagination) {
+        function loadMore(index, searchText, minScore, pagination) {
             //  let searchText = $("#search-text").val().trim()
             if (!index || index == "") {
                 return false
@@ -344,10 +387,11 @@
             }
             if (searchText && (searchText == "" || !searchText || searchText.length < 3)) {
                 $('#meterial_table').addClass('hidden')
+                $('#meterial_test_table').addClass('hidden')
                 $('#loadMore').addClass('hidden')
                 return false
             }
-            let exactMatch=$("#exactMatch").prop("checked")
+            let exactMatch=$("#exactMatch").prop("checked");
             $.ajax({
                 url: '../api/search',
                 data: JSON.stringify({
@@ -355,6 +399,7 @@
                     text: searchText,
                     from: pagination * 10,
                     exactMatch:exactMatch,
+                    minScore:minScore,
                     source: source,
                 }),
                 method: 'POST',
@@ -363,6 +408,8 @@
                 success: function (data) {
                     if (index == 'makt') {
                         $('.results').removeClass('hidden')
+                    } else if (index == 'test') {
+                        $('.test_results').removeClass('hidden')
                     } else {
                         $('.customer_results').removeClass('hidden')
                     }
@@ -436,6 +483,17 @@
 
                             ]);
                         }
+                    } else if (index == "test") {
+                        console.log(final_data)
+                        for (let j = 0; j < final_data.length; j++) {
+                            $('#meterial_test_table').dataTable().fnAddData([
+                                final_data[j].mara_matnr,
+                                final_data[j].inspection_long_text,
+                                final_data[j].basic_long_text,
+                                final_data[j].po_long_text,
+
+                            ]);
+                        }
                     } else {
                         for (let j = 0; j < final_data.length; j++) {
                             let knb1_props = []
@@ -483,7 +541,8 @@
         $("#search").on('click', function () {
             let searchText = $("#search-text").val().trim()
             let exactMatch=$("#exactMatch").prop("checked")
-            let index = $("#selected_index").val()
+            let minScore = $("#minScore").val();
+            let index = $("#selected_index").val();
             if(!searchText || searchText=="")
             {
                 return false
@@ -494,7 +553,7 @@
             }
 
             else {
-                location.href = '/?search-text=' + searchText + '&index=' + index+'&exactMatch='+exactMatch
+                location.href = '/?search-text=' + searchText + '&index=' + index+'&exactMatch='+exactMatch+ '&minScore=' + minScore;
             }
         })
         $("#search-text").bind("keypress", {}, keypressInBox);
@@ -592,6 +651,15 @@
 
 
         $('#meterial_table').DataTable({
+            "dom": 'Zlfrtip',
+            "colResize": {
+                "tableWidthFixed": false
+            },
+            "paging": false,
+            "order": []
+
+        });
+        $('#meterial_test_table').DataTable({
             "dom": 'Zlfrtip',
             "colResize": {
                 "tableWidthFixed": false

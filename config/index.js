@@ -1,19 +1,20 @@
 var env = process.env.NODE_ENV || 'development'
 var config = {
     development: {
-        baseUrl:'http://35.200.147.172',
+        baseUrl:'http://localhost',
         ingest:false,
         port: 5003,
         baseURI: '',
         elasticSearch: {
-            host: '35.200.193.85:9200',
+            host: 'localhost:9200',
             profileType: 'data',
             profileIndex: {
                 makt:'makt',
-                customer:'customer'
+                customer:'customer',
+                test: 'test',
             }
         },
-        db:{
+        db: {
             mongo:{url:'mongodb://localhost:27017/davinchi',sessionSecret: 'ytjfXIAd8TA1ULSN2e45'}
         },
         JWTsecret: 'Ob8GcD4LyZpw5hvUtpXh!',
